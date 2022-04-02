@@ -14,12 +14,22 @@ public class Health : MonoBehaviour
         StartCoroutine(HealthDrain());
     }
 
+    private void OnEnable()
+    {
+        GetComponent<Level>().onLevelUpAction += ResetHealth;
+    }
+
+    private void OnDisable()
+    {
+        GetComponent<Level>().onLevelUpAction -= ResetHealth;
+    }
+
     public float GetHealth()
     {
         return currentHealth;
     }
 
-    public void ResetHealth()
+    private void ResetHealth()
     {
         currentHealth = fullHealth;
     }
