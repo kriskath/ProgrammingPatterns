@@ -4,7 +4,17 @@ using UnityEngine;
 
 public class AbilityRunner : MonoBehaviour
 {
-    [SerializeField] IAbility currentAbility = new RageAbility();
+    [SerializeField] IAbility currentAbility =
+        new SequenceComposite(
+            new IAbility[] 
+            {
+                new HealAbility(),
+                new RageAbility(),
+                new DelayedDecorator(
+                    new RageAbility()
+                )
+            }
+        );
 
     public void UseAbility()
     {
@@ -17,7 +27,43 @@ public interface IAbility
     void Use(GameObject currentGameObject);
 }
 
-public class RageAbility : MonoBehaviour, IAbility
+public class SequenceComposite : IAbility
+{
+    private IAbility[] children;
+
+    public SequenceComposite(IAbility[] children)
+    {
+        this.children = children;
+    }
+
+    public void Use(GameObject currentGameObject)
+    {
+        foreach (var child in children)
+        {
+            child.Use(currentGameObject);
+        }
+    }
+}
+
+
+public class DelayedDecorator : IAbility
+{
+    private IAbility wrappedAbility;
+
+    public DelayedDecorator(IAbility wrappedAbility)
+    {
+        this.wrappedAbility = wrappedAbility;
+    }
+
+    public void Use(GameObject currentGameObject)
+    {
+        //TODO Delay Functionality
+
+        wrappedAbility.Use(currentGameObject);
+    }
+}
+
+public class RageAbility : IAbility
 {
     public void Use(GameObject currentGameObject)
     {
@@ -25,7 +71,7 @@ public class RageAbility : MonoBehaviour, IAbility
     }
 }
 
-public class HealAbility : ScriptableObject, IAbility
+public class HealAbility : IAbility
 {
     public void Use(GameObject currentGameObject)
     {
@@ -40,3 +86,4 @@ public class FireballAbility : IAbility
         Debug.Log("Launch Fireball");
     }
 }
+
