@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class Health : MonoBehaviour
 {
     [SerializeField] float fullHealth = 100f;
     [SerializeField] float drainPerSecond = 2f;
     float currentHealth = 0;
+
+    public event Action onHealthChanged;
 
     private void Awake()
     {
@@ -28,10 +30,15 @@ public class Health : MonoBehaviour
     {
         return currentHealth;
     }
+    public float GetFullHealth()
+    {
+        return fullHealth;
+    }
 
     private void ResetHealth()
     {
         currentHealth = fullHealth;
+        onHealthChanged?.Invoke();
     }
 
     private IEnumerator HealthDrain()
@@ -39,6 +46,7 @@ public class Health : MonoBehaviour
         while (currentHealth > 0)
         {
             currentHealth -= drainPerSecond;
+            onHealthChanged?.Invoke();
             yield return new WaitForSeconds(1);
         }
     }

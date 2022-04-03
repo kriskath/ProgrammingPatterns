@@ -11,25 +11,18 @@ public class Level : MonoBehaviour
     int experiencePoints = 0;
 
     public event Action onLevelUpAction;
+    public event Action onExperienceChanged;
 
-    //coroutine
-    IEnumerator Start()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.2f);
-            GainExperience(10);
-        }
-    }
 
     public void GainExperience(int points)
     {
         int level = GetLevel();
         experiencePoints += points;
+
+        onExperienceChanged?.Invoke();
+
         if (GetLevel() > level)
         {
-            //onLevelUp?.Invoke();
-
             onLevelUpAction?.Invoke();
         }
     }
